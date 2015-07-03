@@ -1,0 +1,8 @@
+{
+    "require-dev": {
+        "pmvc-plugin/view": "*"
+    },
+    "require": {
+        "pmvc-plugin/dotenv": "^0.1.0"
+    }
+}
