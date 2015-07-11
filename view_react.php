@@ -13,14 +13,20 @@ class view_react extends ViewEngine
 
     private function run()
     {
-        return shell_exec($this->node.' '.$this->folder.'/server.js');
+        $get = escapeshellarg($this['react_data']);
+        //$get = '{}';
+        return shell_exec($this->node.' '.$this->folder.'/server.js '.$get);
     }
 
     public function process()
     {
         $t = $this->initTemplateHelper($this->folder);
         $file = $this->getTplFile($this->path);
-        $this->set('run', $this->run());
+        if (empty($this['run'])) {
+            $this['react_data'] = json_encode($this->get());
+            $this['run'] = trim($this->run());
+        }
         include($file);
+        $this->clean();
     }
 }
