@@ -13,8 +13,10 @@ class view_react extends ViewEngine
 
     private function run()
     {
+        if (empty($this->node)) {
+            return false;
+        }
         $get = escapeshellarg($this['react_data']);
-        //$get = '{}';
         return shell_exec($this->node.' '.$this->folder.'/server.js '.$get);
     }
 
