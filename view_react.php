@@ -8,7 +8,7 @@ class view_react extends ViewEngine
     private $node;
     public function init()
     {
-        $this->node = getenv('NODE');
+        $this->node = \PMVC\plug('get')->get('NODE');
     }
 
     private function run()
@@ -22,8 +22,8 @@ class view_react extends ViewEngine
 
     public function process()
     {
-        $t = $this->initTemplateHelper($this->folder);
-        $file = $this->getTplFile($this->path);
+        $t = $this->initTemplateHelper($this['themeDir']);
+        $file = $this->getTplFile($this['themePath']);
         if (empty($this['run'])) {
             $this['react_data'] = json_encode($this->get());
             $this['run'] = trim($this->run());
