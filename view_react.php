@@ -24,6 +24,7 @@ class view_react extends ViewEngine
     {
         $t = $this->initTemplateHelper($this['themeDir']);
         $file = $this->getTplFile($this['themePath']);
+        $this->set('path',$this['themePath']);
         if (empty($this['run'])) {
             $this['react_data'] = json_encode($this->get());
             $this['run'] = trim($this->run());
