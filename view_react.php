@@ -22,6 +22,10 @@ class view_react extends ViewEngine
 
     public function process()
     {
+        if (!\PMVC\realpath($this['themeDir'])) {
+            trigger_error('Template folder was not found: ['.$this['themeDir'].']');
+            return;
+        }
         $t = $this->initTemplateHelper($this['themeDir']);
         $file = $this->getTplFile($this['themePath']);
         $this->set('path',$this['themePath']);
@@ -29,7 +33,11 @@ class view_react extends ViewEngine
             $this['react_data'] = json_encode($this->get());
             $this['run'] = trim($this->run());
         }
-        include($file);
+        if (\PMVC\realpath($file)) {
+            include($file);
+        } else {
+            trigger_error('Template fie was not found: ['.$file.']');
+        }
         $this->clean();
     }
 }
