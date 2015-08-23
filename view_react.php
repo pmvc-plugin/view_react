@@ -28,10 +28,19 @@ class view_react extends ViewEngine
         }
         $t = $this->initTemplateHelper($this['themeDir']);
         $file = $this->getTplFile($this['themePath']);
-        $this->set('path',$this['themePath']);
         if (empty($this['run'])) {
+            $this->set('path',$this['themePath']);
             $this['react_data'] = json_encode($this->get());
-            $this['run'] = trim($this->run());
+            $run = trim($this->run());
+            $separator = '<!--start-->';
+            $separatorPos = strpos($run,$separator);
+            $this['run_css'] = substr($run,0,$separatorPos);
+            if ( !empty($this['run_css']) || 0===$separatorPos ) {
+                $runStart =  strlen($this['run_css'].$separator);
+                $this['run'] = substr($run,$runStart);
+            } else {
+                $this['run'] =& $run; 
+            }
         }
         if (\PMVC\realpath($file)) {
             include($file);
