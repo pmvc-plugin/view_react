@@ -39,7 +39,7 @@ class view_react extends ViewEngine
                 $runStart =  strlen($this['run_css'].$separator);
                 $this['run'] = substr($run,$runStart);
             } else {
-                $this['run'] =& $run; 
+                $this['run'] = $run; 
             }
         }
         if (\PMVC\realpath($file)) {
