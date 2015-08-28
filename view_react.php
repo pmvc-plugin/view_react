@@ -17,6 +17,7 @@ class view_react extends ViewEngine
             return false;
         }
         $get = escapeshellarg($this['react_data']);
+        // node ../themes/react_case/server.js '{"path":"home"}'
         return shell_exec($this->node.' '.$this['themeDir'].'/server.js '.$get);
     }
 
