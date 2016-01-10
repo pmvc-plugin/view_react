@@ -30,7 +30,6 @@ class view_react extends ViewEngine
         $t = $this->initTemplateHelper($this['themeDir']);
         $file = $this->getTplFile($this['themePath']);
         if (empty($this['run'])) {
-            $this->set('path',$this['themePath']);
             $this['react_data'] = json_encode($this->get());
             $run = trim($this->run());
             $separator = '<!--start-->';
