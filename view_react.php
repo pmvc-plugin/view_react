@@ -28,7 +28,7 @@ class view_react extends ViewEngine
         }
         $t = $this->initTemplateHelper($this['themeDir']);
         if (empty($this['run'])) {
-            $headFile = $this->getTplFile('head');
+            $headFile = $this->getTplFile('head', false);
             if (\PMVC\realpath($headFile)) {
                 include($headFile);
                 flush();
