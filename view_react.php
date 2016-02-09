@@ -27,7 +27,7 @@ class view_react extends ViewEngine
             return !trigger_error('Template folder was not found: ['.$this['themeDir'].']');
         }
         $t = $this->initTemplateHelper($this['themeDir']);
-        if (empty($this['run'])) {
+        if (!isset($this['run'])) {
             $headFile = $this->getTplFile('head', false);
             if (\PMVC\realpath($headFile)) {
                 include($headFile);
@@ -45,7 +45,7 @@ class view_react extends ViewEngine
                 $this['run'] = $run; 
             }
         }
-        $file = $this->getTplFile($this['themePath']);
+        $file = $this->getTplFile($this->get('themePath'));
         if (\PMVC\realpath($file)) {
             include($file);
         } else {
