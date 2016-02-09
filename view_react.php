@@ -45,7 +45,7 @@ class view_react extends ViewEngine
                 $this['run'] = $run; 
             }
         }
-        $file = $this->getTplFile($this->get('themePath'));
+        $file = $this->getTplFile($this['themePath']);
         if (\PMVC\realpath($file)) {
             include($file);
         } else {
