@@ -3,13 +3,23 @@ namespace PMVC\PlugIn\view;
 
 ${_INIT_CONFIG}[_CLASS] = __NAMESPACE__.'\view_react';
 
+const SEPARATOR = '<!--start-->';
+
+/**
+ * @parameters string NODE node bin path
+ * @parameters string themeFolder
+ * @parameters string themePath
+ * @parameters string reactData
+ * @parameters string CSS 
+ */
 class view_react extends ViewEngine
 {
-    private $_node;
     private $_returnCode;
     public function init()
     {
-        $this->_node = \PMVC\plug('get')->get('NODE');
+        if (!isset($this['NODE'])) {
+            $this['NODE'] = \PMVC\plug('get')->get('NODE');
+        }
     }
 
     private function _shell($command, $input, &$returnCode)
@@ -32,12 +42,12 @@ class view_react extends ViewEngine
 
     private function _run()
     {
-        if (empty($this->_node)) {
+        if (empty($this['NODE'])) {
             return false;
         }
         // node ../themes/react_case/server.js '{"path":"home"}'
-        $cmd = $this->_node.' '.$this['themeFolder'].'/server.js';
-        return $this->_shell($cmd,$this['react_data'],$this->_returnCode);
+        $cmd = $this['NODE'].' '.$this['themeFolder'].'/server.js';
+        return $this->_shell($cmd,$this['reactData'],$this->_returnCode);
     }
 
     public function process()
@@ -45,24 +55,23 @@ class view_react extends ViewEngine
         $t = $this->initTemplateHelper();
         if (!isset($this['run'])) {
             $headFile = $this->getTplFile('head', false);
-            if (\PMVC\realpath($headFile)) {
+            if ($headFile) {
                 include($headFile);
                 flush();
             }
-            $this['react_data'] = json_encode($this->get());
+            $this['reactData'] = json_encode($this->get());
             $run = trim($this->_run());
-            $separator = '<!--start-->';
-            $separatorPos = strpos($run,$separator);
-            $this['run_css'] = substr($run,0,$separatorPos);
-            if ( !empty($this['run_css']) || 0===$separatorPos ) {
-                $runStart =  strlen($this['run_css'].$separator);
+            $separatorPos = strpos($run, SEPARATOR);
+            $this['CSS'] = substr($run,0,$separatorPos);
+            if ( !empty($this['CSS']) || 0===$separatorPos ) {
+                $runStart =  strlen($this['CSS'].SEPARATOR);
                 $this['run'] = substr($run,$runStart);
             } else {
                 $this['run'] = $run; 
             }
         }
         $file = $this->getTplFile($this['themePath']);
-        if (\PMVC\realpath($file)) {
+        if ($file) {
             include($file);
         } else {
             trigger_error('Template fie was not found: ['.$file.']');
