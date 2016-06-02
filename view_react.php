@@ -5,28 +5,44 @@ ${_INIT_CONFIG}[_CLASS] = __NAMESPACE__.'\view_react';
 
 class view_react extends ViewEngine
 {
-    private $node;
+    private $_node;
+    private $_returnCode;
     public function init()
     {
-        $this->node = \PMVC\plug('get')->get('NODE');
+        $this->_node = \PMVC\plug('get')->get('NODE');
     }
 
-    private function run()
+    private function _shell($command, $input, &$returnCode)
     {
-        if (empty($this->node)) {
+        $proc = proc_open($command, [ 
+            ['pipe','r'],
+            ['pipe','w'],
+            ['pipe','a']
+        ], $pipes);
+        $result = null;
+        if (is_resource($proc)) {
+            fwrite($pipes[0],$input);
+            fclose($pipes[0]);
+            $result = stream_get_contents($pipes[1]);
+            fclose($pipes[1]);
+            $returnCode = proc_close($proc);
+        }
+        return $result;
+    }
+
+    private function _run()
+    {
+        if (empty($this->_node)) {
             return false;
         }
         // node ../themes/react_case/server.js '{"path":"home"}'
-        $cmd = $this->node.' '.$this['themeDir'].'/server.js '.escapeshellarg($this['react_data']);
-        return shell_exec($cmd);
+        $cmd = $this->_node.' '.$this['themeFolder'].'/server.js';
+        return $this->_shell($cmd,$this['react_data'],$this->_returnCode);
     }
 
     public function process()
     {
-        if (!\PMVC\realpath($this['themeDir'])) {
-            return !trigger_error('Template folder was not found: ['.$this['themeDir'].']');
-        }
-        $t = $this->initTemplateHelper($this['themeDir']);
+        $t = $this->initTemplateHelper();
         if (!isset($this['run'])) {
             $headFile = $this->getTplFile('head', false);
             if (\PMVC\realpath($headFile)) {
@@ -34,7 +50,7 @@ class view_react extends ViewEngine
                 flush();
             }
             $this['react_data'] = json_encode($this->get());
-            $run = trim($this->run());
+            $run = trim($this->_run());
             $separator = '<!--start-->';
             $separatorPos = strpos($run,$separator);
             $this['run_css'] = substr($run,0,$separatorPos);
