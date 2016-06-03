@@ -6,11 +6,11 @@ ${_INIT_CONFIG}[_CLASS] = __NAMESPACE__.'\view_react';
 const SEPARATOR = '<!--start-->';
 
 /**
+ * Parameters
  * @parameters string NODE node bin path
- * @parameters string themeFolder
- * @parameters string themePath
  * @parameters string reactData
  * @parameters string CSS 
+ * @see https://github.com/pmvc-plugin/view/blob/master/src/ViewEngine.php
  */
 class view_react extends ViewEngine
 {
