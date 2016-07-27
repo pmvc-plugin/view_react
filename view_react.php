@@ -47,6 +47,10 @@ class view_react extends ViewEngine
         }
         // node ../themes/react_case/server.js '{"path":"home"}'
         $cmd = $this['NODE'].' '.$this['themeFolder'].'/server.js';
+        \PMVC\dev(function() use($cmd) {
+            $s = "echo '".$this['reactData']."' | ".$cmd;
+            return $s;
+        }, 'view');
         return $this->_shell($cmd,$this['reactData'],$this->_returnCode);
     }
 
