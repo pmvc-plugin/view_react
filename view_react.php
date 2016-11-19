@@ -10,6 +10,7 @@ const SEPARATOR = '<!--start-->';
  * @parameters string NODE node bin path
  * @parameters string reactData
  * @parameters string CSS 
+ * @parameters string jsFile custom js path 
  * @see https://github.com/pmvc-plugin/view/blob/master/src/ViewEngine.php
  */
 class view_react extends ViewEngine
@@ -45,8 +46,9 @@ class view_react extends ViewEngine
         if (empty($this['NODE'])) {
             return false;
         }
-        // node ../themes/react_case/server.js '{"path":"home"}'
-        $cmd = $this['NODE'].' '.$this['themeFolder'].'/server.js';
+        // echo '{"themePath":"home"}' | node ./server.js
+        $js = \PMVC\value($this, ['jsFile'], $this['themeFolder'].'/server.js');
+        $cmd = $this['NODE'].' '.$js;
         \PMVC\dev(function() use($cmd) {
             $s = "echo '".$this['reactData']."' | ".$cmd;
             return $s;
