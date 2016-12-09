@@ -63,7 +63,7 @@ class view_react extends ViewEngine
             $headFile = $this->getTplFile('head', false);
             if ($headFile) {
                 include($headFile);
-                flush();
+                $this->flush();
             }
             $this['reactData'] = json_encode($this->get());
             $run = trim($this->_run());
@@ -79,6 +79,7 @@ class view_react extends ViewEngine
         $file = $this->getTplFile($this['themePath']);
         if ($file) {
             include($file);
+            $this->flush();
         } else {
             trigger_error('Template fie was not found: ['.$file.']');
         }
