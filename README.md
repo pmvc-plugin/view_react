@@ -27,3 +27,8 @@
 #### 2.2 Or use composer command-line
    * php composer.phar require pmvc-plugin/view_react
 
+
+## For debug
+```
+echo '{"themePath":"home"}' | node ./server.js
+```
