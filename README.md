@@ -4,7 +4,7 @@
 [![License](https://poser.pugx.org/pmvc-plugin/view_react/license)](https://packagist.org/packages/pmvc-plugin/view_react)
 [![Total Downloads](https://poser.pugx.org/pmvc-plugin/view_react/downloads)](https://packagist.org/packages/pmvc-plugin/view_react) 
 
-# [PMVC] The first one php view template use react.js  
+# [PMVC] PHP view template with react.js  
 ===============
 
 ## Install with Composer
