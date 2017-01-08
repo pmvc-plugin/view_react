@@ -60,11 +60,6 @@ class view_react extends ViewEngine
     {
         $t = $this->initTemplateHelper();
         if (!isset($this['run'])) {
-            $headFile = $this->getTplFile('head', false);
-            if ($headFile) {
-                include($headFile);
-                $this->flush();
-            }
             $this['reactData'] = json_encode($this->get());
             $run = trim($this->_run());
             $separatorPos = strpos($run, SEPARATOR);
@@ -81,8 +76,14 @@ class view_react extends ViewEngine
             include($file);
             $this->flush();
         } else {
-            trigger_error('Template fie was not found: ['.$file.']');
+            trigger_error(
+                'Template fie was not found: ['.
+                $file.
+                ']'
+            );
         }
-        $this->clean();
+        if (!empty($this['run'])) {
+            $this->clean();
+        }
     }
 }
