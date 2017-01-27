@@ -64,6 +64,9 @@ class view_react extends ViewEngine
         $t = $this->initTemplateHelper();
         if (!isset($this['run'])) {
             $this['reactData'] = json_encode($this->get());
+            if (empty($this['reactData'])) {
+                $this['reactData'] = '{}';
+            }
             $run = trim($this->_run());
             $separatorPos = strpos($run, SEPARATOR);
             $this['CSS'] = substr($run,0,$separatorPos);
