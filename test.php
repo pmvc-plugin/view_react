@@ -1,7 +1,7 @@
 <?php
 PMVC\Load::plug();
 PMVC\addPlugInFolders(['../']);
-class HtmlViewTest extends PHPUnit_Framework_TestCase
+class ReactViewTest extends PHPUnit_Framework_TestCase
 {
     function testHtmlView()
     {
