@@ -59,6 +59,12 @@ class view_react extends ViewEngine
         return $this->_shell($cmd,$this['reactData'],$this->_returnCode);
     }
 
+    public function load($__f)
+    {
+        include($__f);
+        $this->flush();
+    }
+
     public function process()
     {
         $t = $this->initTemplateHelper();
@@ -79,8 +85,7 @@ class view_react extends ViewEngine
         }
         $file = $this->getTplFile($this['themePath']);
         if ($file) {
-            include($file);
-            $this->flush();
+            $this->load($file);
         } else {
             trigger_error(
                 'Template fie was not found: ['.
