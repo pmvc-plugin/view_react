@@ -18,8 +18,10 @@ class view_react extends ViewEngine
     private $_returnCode;
     public function init()
     {
+        /*For disable output buffer*/
         $this['headers']=[
-            'X-Accel-Buffering: no'
+            'X-Accel-Buffering: no',
+            'Content-Encoding: none'
         ];
         if (!isset($this['NODE'])) {
             $this['NODE'] = \PMVC\plug('get')->get('NODE');
