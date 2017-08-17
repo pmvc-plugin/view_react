@@ -7,7 +7,7 @@ const SEPARATOR = '<!--start-->';
 
 /**
  * Parameters
- * @parameters string NODE node bin path
+ * @parameters string NODEJS node bin path
  * @parameters string reactData
  * @parameters string CSS 
  * @parameters string jsFile custom js path 
@@ -23,9 +23,7 @@ class view_react extends ViewEngine
             'X-Accel-Buffering: no',
             'Content-Encoding: none'
         ];
-        if (!isset($this['NODE'])) {
-            $this['NODE'] = \PMVC\plug('get')->get('NODE');
-        }
+        $this['NODEJS'] = \PMVC\realpath($this['NODEJS']);
     }
 
     private function _shell($command, $input, &$returnCode)
@@ -48,12 +46,13 @@ class view_react extends ViewEngine
 
     private function _run()
     {
-        if (empty($this['NODE'])) {
+        if (empty($this['NODEJS'])) {
             return false;
         }
         // echo '{"themePath":"home"}' | node ./server.js
         $js = \PMVC\value($this, ['jsFile'], $this['themeFolder'].'/server.js');
-        $cmd = $this['NODE'].' '.$js;
+        $js = \PMVC\realPath($js);
+        $cmd = $this['NODEJS'].' '.$js;
         \PMVC\dev(function() use($cmd) {
             $s = "echo '".$this['reactData']."' | ".$cmd;
             return $s;
