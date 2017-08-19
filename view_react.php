@@ -1,6 +1,8 @@
 <?php
 namespace PMVC\PlugIn\view;
 
+use DomainException; 
+
 ${_INIT_CONFIG}[_CLASS] = __NAMESPACE__.'\view_react';
 
 const SEPARATOR = '<!--start-->';
@@ -23,7 +25,6 @@ class view_react extends ViewEngine
             'X-Accel-Buffering: no',
             'Content-Encoding: none'
         ];
-        $this['NODEJS'] = \PMVC\realpath($this['NODEJS']);
     }
 
     private function _shell($command, $input, &$returnCode)
@@ -46,13 +47,14 @@ class view_react extends ViewEngine
 
     private function _run()
     {
-        if (empty($this['NODEJS'])) {
-            return false;
+        $nodejs = \PMVC\realpath($this['NODEJS']);
+        if (empty($nodejs)) {
+            throw new DomainException('NodeJs path was missing. ['. $this['NODEJS']. ']');
         }
         // echo '{"themePath":"home"}' | node ./server.js
         $js = \PMVC\value($this, ['jsFile'], $this['themeFolder'].'/server.js');
         $js = \PMVC\realPath($js);
-        $cmd = $this['NODEJS'].' '.$js;
+        $cmd = $nodejs.' '.$js;
         \PMVC\dev(function() use($cmd) {
             $s = "echo '".$this['reactData']."' | ".$cmd;
             return $s;
