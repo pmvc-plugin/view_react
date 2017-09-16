@@ -70,7 +70,6 @@ class view_react extends ViewEngine
 
     public function process()
     {
-        $t = $this->initTemplateHelper();
         if (!isset($this['run'])) {
             $this['reactData'] = json_encode($this->get());
             if (empty($this['reactData'])) {
