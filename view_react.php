@@ -76,6 +76,9 @@ class view_react extends ViewEngine
                 $this['reactData'] = '{}';
             }
             $run = trim($this->_run());
+            \PMVC\dev(function() use($run) {
+                return $run;
+            }, 'view');
             $separatorPos = strpos($run, SEPARATOR);
             $this['CSS'] = substr($run,0,$separatorPos);
             if ( !empty($this['CSS']) || 0===$separatorPos ) {
