@@ -32,3 +32,10 @@
 ```
 echo '{"themePath":"home"}' | node ./server.js
 ```
+
+## Facebook crawler issue
+* https://github.com/pmvc-plugin/view_react/issues/1
+* Can't set header for none encoding, original proposal was for disable proxy cache to improve first bytes.
+```
+    'Content-Encoding: none'
+```
