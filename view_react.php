@@ -23,6 +23,8 @@ class view_react extends ViewEngine
         /*For disable output buffer*/
         $this['headers']=[
             'X-Accel-Buffering: no',
+            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+            'Content-Encoding: identity',
         ];
     }
 
