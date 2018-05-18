@@ -9,10 +9,11 @@ const SEPARATOR = '<!--start-->';
 
 /**
  * Parameters
- * @parameters string NODEJS node bin path
+ * @parameters string NODEJS      node bin path
  * @parameters string reactData
  * @parameters string CSS 
- * @parameters string jsFile custom js path 
+ * @parameters string jsFile      custom server.js path 
+ * @parameters bool   ttfb        ttfb runtime status 
  * @see https://github.com/pmvc-plugin/view/blob/master/src/ViewEngine.php
  */
 class view_react extends ViewEngine
@@ -20,12 +21,14 @@ class view_react extends ViewEngine
     private $_returnCode;
     public function init()
     {
-        /*For disable output buffer*/
-        $this['headers']=[
-            'X-Accel-Buffering: no',
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
-            'Content-Encoding: identity',
-        ];
+        if (empty(\PMVC\getOption('disableTTFB'))) {
+            /*For disable output buffer*/
+            $this['headers']=[
+                'X-Accel-Buffering: no',
+                // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
+                'Content-Encoding: identity',
+            ];
+        }
     }
 
     private function _shell($command, $input, &$returnCode)
