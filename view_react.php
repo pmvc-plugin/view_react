@@ -60,7 +60,10 @@ class view_react extends ViewEngine
         $js = \PMVC\realPath($js);
         $cmd = $nodejs.' '.$js;
         \PMVC\dev(function() use($cmd) {
-            $s = "echo '".$this['reactData']."' | ".$cmd;
+            $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
+            chmod($tmpFile, 0777);
+            file_put_contents($tmpFile, $this['reactData']);
+            $s = 'cat '.$tmpFile.' | '.$cmd;
             return $s;
         }, 'view');
         return $this->_shell($cmd,$this['reactData'],$this->_returnCode);
