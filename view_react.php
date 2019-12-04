@@ -78,7 +78,7 @@ class view_react extends ViewEngine
     public function process()
     {
         if (!isset($this['run'])) {
-            $this['reactData'] = json_encode($this->get());
+            $this['reactData'] = json_encode($this->get(), JSON_HEX_APOS);
             if (empty($this['reactData'])) {
                 $this['reactData'] = '{}';
             }
