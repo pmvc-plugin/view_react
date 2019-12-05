@@ -49,8 +49,9 @@ class view_react extends ViewEngine
         return $result;
     }
 
-    private function _run()
+    private function _run($data)
     {
+        $data = $data ? json_encode($data) : '{}';
         $nodejs = \PMVC\realpath($this['NODEJS']);
         if (empty($nodejs)) {
             throw new DomainException('NodeJs path was missing. ['. $this['NODEJS']. ']');
@@ -62,11 +63,11 @@ class view_react extends ViewEngine
         \PMVC\dev(function() use($cmd) {
             $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
             chmod($tmpFile, 0777);
-            file_put_contents($tmpFile, $this['reactData']);
+            file_put_contents($tmpFile, $data);
             $s = 'cat '.$tmpFile.' | '.$cmd;
             return $s;
         }, 'view');
-        return $this->_shell($cmd,$this['reactData'],$this->_returnCode);
+        return $this->_shell($cmd,$data,$this->_returnCode);
     }
 
     private function _load($__f)
@@ -82,11 +83,9 @@ class view_react extends ViewEngine
     public function process()
     {
         if (!isset($this['run'])) {
-            $this['reactData'] = $this->toJson($this->get());
-            if (empty($this['reactData'])) {
-                $this['reactData'] = '{}';
-            }
-            $run = trim($this->_run());
+            $reactData = $this->get();
+            $this['reactData'] = $this->toJson($reactData);
+            $run = trim($this->_run($reactData));
             \PMVC\dev(function() use($run) {
                 return $run;
             }, 'view');
