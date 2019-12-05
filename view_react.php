@@ -75,10 +75,14 @@ class view_react extends ViewEngine
         $this->flush();
     }
 
+    public function toJson($s) {
+      return $s ? str_replace('\u0022', '\\\u0022', json_encode($s, JSON_HEX_APOS|JSON_HEX_QUOT)) : '{}';
+    }
+
     public function process()
     {
         if (!isset($this['run'])) {
-            $this['reactData'] = json_encode($this->get(), JSON_HEX_APOS);
+            $this['reactData'] = $this->toJson($this->get());
             if (empty($this['reactData'])) {
                 $this['reactData'] = '{}';
             }
