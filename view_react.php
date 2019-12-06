@@ -3,18 +3,20 @@ namespace PMVC\PlugIn\view;
 
 use DomainException; 
 
-${_INIT_CONFIG}[_CLASS] = __NAMESPACE__.'\view_react';
+${_INIT_CONFIG
+}[_CLASS] = __NAMESPACE__.'\view_react';
 
 const SEPARATOR = '<!--start-->';
 
 /**
  * Parameters
+ *
  * @parameters string NODEJS      node bin path
  * @parameters string reactData
  * @parameters string CSS 
  * @parameters string jsFile      custom server.js path 
  * @parameters bool   ttfb        ttfb runtime status 
- * @see https://github.com/pmvc-plugin/view/blob/master/src/ViewEngine.php
+ * @see        https://github.com/pmvc-plugin/view/blob/master/src/ViewEngine.php
  */
 class view_react extends ViewEngine
 {
@@ -33,14 +35,16 @@ class view_react extends ViewEngine
 
     private function _shell($command, $input, &$returnCode)
     {
-        $proc = proc_open($command, [ 
+        $proc = proc_open(
+            $command, [ 
             ['pipe','r'],
             ['pipe','w'],
             ['pipe','a']
-        ], $pipes);
+            ], $pipes
+        );
         $result = null;
         if (is_resource($proc)) {
-            fwrite($pipes[0],$input);
+            fwrite($pipes[0], $input);
             fclose($pipes[0]);
             $result = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
@@ -49,7 +53,7 @@ class view_react extends ViewEngine
         return $result;
     }
 
-    private function _run($data)
+    private function _process_ssr($data)
     {
         $data = $data ? json_encode($data) : '{}';
         $nodejs = \PMVC\realpath($this['NODEJS']);
@@ -60,40 +64,46 @@ class view_react extends ViewEngine
         $js = \PMVC\value($this, ['jsFile'], $this['themeFolder'].'/server.js');
         $js = \PMVC\realPath($js);
         $cmd = $nodejs.' '.$js;
-        \PMVC\dev(function() use($cmd) {
-            $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
-            chmod($tmpFile, 0777);
-            file_put_contents($tmpFile, $data);
-            $s = 'cat '.$tmpFile.' | '.$cmd;
-            return $s;
-        }, 'view');
-        return $this->_shell($cmd,$data,$this->_returnCode);
+        \PMVC\dev(
+            function () use ($cmd) {
+                $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
+                chmod($tmpFile, 0777);
+                file_put_contents($tmpFile, $data);
+                $s = 'cat '.$tmpFile.' | '.$cmd;
+                return $s;
+            }, 'view'
+        );
+        return trim($this->_shell($cmd, $data, $this->_returnCode));
     }
 
     private function _load($__f)
     {
-        include($__f);
+        include $__f;
         $this->flush();
     }
 
-    public function toJson($s) {
-      return $s ? str_replace('\u0022', '\\\u0022', json_encode($s, JSON_HEX_APOS|JSON_HEX_QUOT)) : '{}';
+    public function toJsonParse($s) 
+    {
+        return $s ?
+        'JSON.parse(\''.str_replace('\\"', '\\\"', json_encode($s, JSON_HEX_APOS|JSON_UNESCAPED_UNICODE)).'\')' : 
+        '';
     }
 
     public function process()
     {
         if (!isset($this['run'])) {
-            $reactData = $this->get();
-            $this['reactData'] = $this->toJson($reactData);
-            $run = trim($this->_run($reactData));
-            \PMVC\dev(function() use($run) {
-                return $run;
-            }, 'view');
+            $this['reactData'] = $this->get();
+            $run = $this->_process_ssr($this['reactData']);
+            \PMVC\dev(
+                function () use ($run) {
+                    return $run;
+                }, 'view'
+            );
             $separatorPos = strpos($run, SEPARATOR);
-            $this['CSS'] = substr($run,0,$separatorPos);
-            if ( !empty($this['CSS']) || 0===$separatorPos ) {
+            $this['CSS'] = substr($run, 0, $separatorPos);
+            if (!empty($this['CSS']) || 0===$separatorPos ) {
                 $runStart =  strlen($this['CSS'].SEPARATOR);
-                $this['run'] = substr($run,$runStart);
+                $this['run'] = substr($run, $runStart);
             } else {
                 $this['run'] = $run; 
             }
