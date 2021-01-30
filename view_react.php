@@ -85,7 +85,7 @@ class view_react extends ViewEngine
     public function toJsonParse($s) 
     {
         return $s ?
-        'JSON.parse(\''.str_replace('\\"', '\\\"', json_encode($s, JSON_HEX_APOS|JSON_UNESCAPED_UNICODE)).'\')' : 
+        'JSON.parse(\''.str_replace(['\\'], ['\\\\'], json_encode($s, JSON_HEX_APOS|JSON_UNESCAPED_UNICODE)).'\')' : 
         '';
     }
 
