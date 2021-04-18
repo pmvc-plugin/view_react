@@ -1,3 +1,5 @@
 vendor
 composer.lock
-.env
+.php_cs.cache
+.phpunit.result.cache
+.*.sw?

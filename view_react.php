@@ -1,21 +1,17 @@
 <?php
 namespace PMVC\PlugIn\view;
 
-use DomainException; 
-
-${_INIT_CONFIG
-}[_CLASS] = __NAMESPACE__.'\view_react';
+${_INIT_CONFIG}[_CLASS] = __NAMESPACE__ . '\view_react';
 
 const SEPARATOR = '<!--start-->';
 
 /**
  * Parameters
  *
- * @parameters string NODEJS      node bin path
  * @parameters string reactData
- * @parameters string CSS 
- * @parameters string jsFile      custom server.js path 
- * @parameters bool   ttfb        ttfb runtime status 
+ * @parameters string CSS
+ * @parameters string jsFile      custom server.js path
+ * @parameters bool   ttfb        ttfb runtime status
  * @see        https://github.com/pmvc-plugin/view/blob/master/src/ViewEngine.php
  */
 class view_react extends ViewEngine
@@ -25,7 +21,7 @@ class view_react extends ViewEngine
     {
         if (empty(\PMVC\getOption('disableTTFB'))) {
             /*For disable output buffer*/
-            $this['headers']=[
+            $this['headers'] = [
                 'X-Accel-Buffering: no',
                 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Encoding
                 'Content-Encoding: identity',
@@ -36,11 +32,9 @@ class view_react extends ViewEngine
     private function _shell($command, $input, &$returnCode)
     {
         $proc = proc_open(
-            $command, [ 
-            ['pipe','r'],
-            ['pipe','w'],
-            ['pipe','a']
-            ], $pipes
+            $command,
+            [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']],
+            $pipes
         );
         $result = null;
         if (is_resource($proc)) {
@@ -56,23 +50,23 @@ class view_react extends ViewEngine
     private function _process_ssr($data)
     {
         $data = $data ? json_encode($data) : '{}';
-        $nodejs = \PMVC\realpath($this['NODEJS']);
-        if (empty($nodejs)) {
-            throw new DomainException('NodeJs path was missing. ['. $this['NODEJS']. ']');
-        }
+        $nodejs = \PMVC\plug('nodejs')->getNodeJs();
+
         // echo '{"themePath":"home"}' | node ./server.js
-        $js = \PMVC\value($this, ['jsFile'], $this['themeFolder'].'/server.js');
-        $js = \PMVC\realPath($js);
-        $cmd = $nodejs.' '.$js;
-        \PMVC\dev(
-            function () use ($cmd, $data) {
-                $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
-                chmod($tmpFile, 0777);
-                file_put_contents($tmpFile, $data);
-                $s = 'cat '.$tmpFile.' | '.$cmd;
-                return $s;
-            }, 'view'
+        $js = \PMVC\value(
+            $this,
+            ['jsFile'],
+            $this['themeFolder'] . '/server.js'
         );
+        $js = \PMVC\realPath($js);
+        $cmd = $nodejs . ' ' . $js;
+        \PMVC\dev(function () use ($cmd, $data) {
+            $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
+            chmod($tmpFile, 0777);
+            file_put_contents($tmpFile, $data);
+            $s = 'cat ' . $tmpFile . ' | ' . $cmd;
+            return $s;
+        }, 'view');
         return trim($this->_shell($cmd, $data, $this->_returnCode));
     }
 
@@ -82,11 +76,17 @@ class view_react extends ViewEngine
         $this->flush();
     }
 
-    public function toJsonParse($s) 
+    public function toJsonParse($s)
     {
-        return $s ?
-        'JSON.parse(\''.str_replace(['\\'], ['\\\\'], json_encode($s, JSON_HEX_APOS|JSON_UNESCAPED_UNICODE)).'\')' : 
-        '';
+        return $s
+            ? 'JSON.parse(\'' .
+                    str_replace(
+                        ['\\'],
+                        ['\\\\'],
+                        json_encode($s, JSON_HEX_APOS | JSON_UNESCAPED_UNICODE)
+                    ) .
+                    '\')'
+            : '';
     }
 
     public function process()
@@ -94,29 +94,23 @@ class view_react extends ViewEngine
         if (!isset($this['run'])) {
             $this['reactData'] = $this->get();
             $run = $this->_process_ssr($this['reactData']);
-            \PMVC\dev(
-                function () use ($run) {
-                    return $run;
-                }, 'view'
-            );
+            \PMVC\dev(function () use ($run) {
+                return $run;
+            }, 'view');
             $separatorPos = strpos($run, SEPARATOR);
             $this['CSS'] = substr($run, 0, $separatorPos);
-            if (!empty($this['CSS']) || 0===$separatorPos ) {
-                $runStart =  strlen($this['CSS'].SEPARATOR);
+            if (!empty($this['CSS']) || 0 === $separatorPos) {
+                $runStart = strlen($this['CSS'] . SEPARATOR);
                 $this['run'] = substr($run, $runStart);
             } else {
-                $this['run'] = $run; 
+                $this['run'] = $run;
             }
         }
         $file = $this->getTplFile($this['themePath']);
         if ($file) {
             $this->_load($file);
         } else {
-            trigger_error(
-                'Template fie was not found: ['.
-                $file.
-                ']'
-            );
+            trigger_error('Template fie was not found: [' . $file . ']');
         }
         if (!empty($this['run'])) {
             $this->clean();

@@ -12,7 +12,11 @@
         }
     ],
     "require": {
-        "pmvc-plugin/view": "*"
+        "pmvc-plugin/view": "*",
+        "pmvc-plugin/nodejs": "*"
+    },
+    "require-dev": {
+        "pmvc-plugin/unit": "*"
     },
     "minimum-stability": "dev"
 }
