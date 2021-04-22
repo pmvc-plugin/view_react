@@ -86,7 +86,7 @@ class view_react extends ViewEngine
                         json_encode($s, JSON_HEX_APOS | JSON_UNESCAPED_UNICODE)
                     ) .
                     '\')'
-            : '';
+            : '{}';
     }
 
     public function process()
