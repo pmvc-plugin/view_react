@@ -1,22 +1,27 @@
 {
-    "name": "pmvc-plugin/view_react",
-    "description": "PMVC view engine for react.js",
-    "type": "library",
-    "homepage": "https://github.com/pmvc-plugin/view_react",
-    "keywords": ["react", "template", "view", "pmvc", "plug-in"],
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Hill",
-            "email": "hill@kimo.com"
-        }
-    ],
-    "require": {
-        "pmvc-plugin/view": "*",
-        "pmvc-plugin/nodejs": "*"
-    },
-    "require-dev": {
-        "pmvc-plugin/unit": "*"
-    },
-    "minimum-stability": "dev"
+  "name": "pmvc-plugin/view_react",
+  "description": "PMVC view engine for react.js",
+  "type": "library",
+  "homepage": "https://github.com/pmvc-plugin/view_react",
+  "keywords": ["react", "template", "view", "pmvc", "plug-in"],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Hill",
+      "email": "hill@kimo.com"
+    }
+  ],
+  "require": {
+    "pmvc-plugin/view": "*",
+    "pmvc-plugin/nodejs": "*"
+  },
+  "require-dev": {
+    "pmvc-plugin/unit": "*"
+  },
+  "config": {
+    "allow-plugins": {
+      "mouf/nodejs-installer": true
+    }
+  },
+  "minimum-stability": "dev"
 }

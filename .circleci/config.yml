@@ -1,0 +1,50 @@
+version: 2.1
+
+jobs:
+  unittest:
+    parameters:
+      php-version:
+        type: string
+      plugin-name:
+        type: string
+        default: "view_react"
+    docker:
+      - image: hillliu/pmvc-phpunit:<< parameters.php-version >>
+    working_directory: /var/www/<< parameters.plugin-name >>
+    steps:
+      - checkout
+      - run:
+          name: "Display information"
+          command: |
+            date
+            php -v
+            php -m
+            php -r "if(function_exists('gd_info'))print_r(gd_info());"
+            composer --version
+            phpunit --version
+      - run:
+          name: Composer install packages
+          command: |
+            composer install
+      - run:
+          name: PHPUnit
+          command: |
+            ENABLE_COVERAGE=false
+            if [ "<< parameters.php-version >>" == "8.1" ] && [ "$ENABLE_COVERAGE" == "true" ]; then
+              XDEBUG_MODE=coverage phpunit --coverage-clover clover.xml
+              coveralls --coverage_clover=clover.xml -v -o coveralls-upload.json
+            else
+              phpunit
+            fi
+      - store_artifacts:
+          path: /var/www/<< parameters.plugin-name >>/clover.xml
+      - store_artifacts:
+          path: /var/www/<< parameters.plugin-name >>/coveralls-upload.json
+
+workflows:
+  run-job:
+    jobs:
+      - unittest:
+          matrix:
+            parameters:
+              php-version: ["8.1", "8.0",  "5.6"]
