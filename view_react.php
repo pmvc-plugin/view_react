@@ -89,7 +89,7 @@ class view_react extends ViewEngine
             : '{}';
     }
 
-    public function process()
+    public function ssr()
     {
         if (!isset($this['run'])) {
             $this['reactData'] = $this->get();
@@ -106,6 +106,10 @@ class view_react extends ViewEngine
                 $this['run'] = $run;
             }
         }
+    }
+
+    public function process()
+    {
         $file = $this->getTplFile($this['themePath']);
         if ($file) {
             $this->_load($file);
