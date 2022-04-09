@@ -92,6 +92,10 @@ class view_react extends ViewEngine
             : '{}';
     }
 
+    /**
+     * ssrHeader should call from template file (html).
+     * so not set switch to disable or enable it.
+     */
     public function ssrHeader()
     {
         $this['reactData'] = $this->get();
@@ -99,6 +103,10 @@ class view_react extends ViewEngine
         $this->flush();
     }
 
+    /**
+     * ssrBody should call from template file (html).
+     * so not set switch to disable or enable it.
+     */
     public function ssrBody()
     {
         $this['ssrcb']();
