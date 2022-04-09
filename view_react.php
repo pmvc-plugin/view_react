@@ -3,7 +3,7 @@ namespace PMVC\PlugIn\view;
 
 ${_INIT_CONFIG}[_CLASS] = __NAMESPACE__ . '\view_react';
 
-const SEPARATOR = '<!--start-->';
+const SEPARATOR = "\r\n\r\n";
 
 /**
  * Parameters
@@ -29,22 +29,25 @@ class view_react extends ViewEngine
         }
     }
 
-    private function _shell($command, $input, &$returnCode)
+    private function _shell($command, $input)
     {
         $proc = proc_open(
             $command,
             [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']],
             $pipes
         );
-        $result = null;
         if (is_resource($proc)) {
             fwrite($pipes[0], $input);
             fclose($pipes[0]);
-            $result = stream_get_contents($pipes[1]);
-            fclose($pipes[1]);
-            $returnCode = proc_close($proc);
+            echo stream_get_line($pipes[1], 8192, SEPARATOR);
+            $this['ssrcb'] = function () use ($pipes, $proc) {
+                while (!feof($pipes[1])) {
+                    echo stream_get_line($pipes[1], 8192, '');
+                }
+                fclose($pipes[1]);
+                $this->_returnCode = proc_close($proc);
+            };
         }
-        return $result;
     }
 
     private function _process_ssr($data)
@@ -67,7 +70,7 @@ class view_react extends ViewEngine
             $s = 'cat ' . $tmpFile . ' | ' . $cmd;
             return $s;
         }, 'view');
-        return trim($this->_shell($cmd, $data, $this->_returnCode));
+        $this->_shell($cmd, $data);
     }
 
     private function _load($__f)
@@ -89,23 +92,17 @@ class view_react extends ViewEngine
             : '{}';
     }
 
-    public function ssr()
+    public function ssrHeader()
     {
-        if (!isset($this['run'])) {
-            $this['reactData'] = $this->get();
-            $run = $this->_process_ssr($this['reactData']);
-            \PMVC\dev(function () use ($run) {
-                return $run;
-            }, 'view');
-            $separatorPos = strpos($run, SEPARATOR);
-            $this['CSS'] = substr($run, 0, $separatorPos);
-            if (!empty($this['CSS']) || 0 === $separatorPos) {
-                $runStart = strlen($this['CSS'] . SEPARATOR);
-                $this['run'] = substr($run, $runStart);
-            } else {
-                $this['run'] = $run;
-            }
-        }
+        $this['reactData'] = $this->get();
+        $this->_process_ssr($this['reactData']);
+        $this->flush();
+    }
+
+    public function ssrBody()
+    {
+        $this['ssrcb']();
+        $this->flush();
     }
 
     public function process()
