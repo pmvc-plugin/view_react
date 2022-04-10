@@ -17,6 +17,7 @@ const SEPARATOR = "\r\n\r\n";
 class view_react extends ViewEngine
 {
     private $_returnCode;
+    private $_openProcId;
     public function init()
     {
         if (empty(\PMVC\getOption('disableTTFB'))) {
@@ -29,6 +30,16 @@ class view_react extends ViewEngine
         }
     }
 
+    private function _killProc()
+    {
+        posix_kill($this->_openProcId, SIGKILL);
+    }
+
+    public function __destruct()
+    {
+        $this->_killProc();
+    }
+
     private function _shell($command, $input)
     {
         $proc = proc_open(
@@ -37,6 +48,9 @@ class view_react extends ViewEngine
             $pipes
         );
         if (is_resource($proc)) {
+            ignore_user_abort(true);
+            $procInfo = proc_get_status($proc);
+            $this->_openProcId = $procInfo['pid'];
             fwrite($pipes[0], $input);
             fclose($pipes[0]);
             echo stream_get_line($pipes[1], 8192, SEPARATOR);
@@ -45,7 +59,9 @@ class view_react extends ViewEngine
                     echo stream_get_line($pipes[1], 8192, '');
                 }
                 fclose($pipes[1]);
+                fclose($pipes[2]);
                 $this->_returnCode = proc_close($proc);
+                is_resource($proc) && proc_terminate($proc, SIGSTOP);
             };
         }
     }
@@ -110,6 +126,7 @@ class view_react extends ViewEngine
     public function ssrBody()
     {
         $this['ssrcb']();
+        $this->_killProc();
         $this->flush();
     }
 
