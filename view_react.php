@@ -32,7 +32,7 @@ class view_react extends ViewEngine
 
     private function _killProc()
     {
-        posix_kill($this->_openProcId, SIGKILL);
+        isset($this->_openProcId) && posix_kill($this->_openProcId, SIGKILL);
     }
 
     public function __destruct()
