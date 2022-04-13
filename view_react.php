@@ -18,6 +18,7 @@ class view_react extends ViewEngine
 {
     private $_returnCode;
     private $_openProcId;
+    private $_bsize = 8192;
     public function init()
     {
         if (empty(\PMVC\getOption('disableTTFB'))) {
@@ -62,15 +63,17 @@ class view_react extends ViewEngine
             $this->_openProcId = $procInfo['pid'];
             fwrite($pipes[0], $input);
             fclose($pipes[0]);
-            echo stream_get_line($pipes[1], 8192, SEPARATOR);
+            echo stream_get_line($pipes[1], $this->_bsize, SEPARATOR);
             $this['ssrcb'] = function () use ($proc, $pipes) {
+                $streamContent = '';
                 while (!feof($pipes[1])) {
                     if (connection_aborted()) {
                         $this->_killProc($proc, $pipes);
                         exit();
                     }
-                    echo stream_get_line($pipes[1], 8192, '');
+                    $streamContent .=  stream_get_line($pipes[1], $this->_bsize, '');
                 }
+                echo $streamContent;
                 $this->_killProc($proc, $pipes);
             };
         }
