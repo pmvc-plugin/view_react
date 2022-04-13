@@ -39,8 +39,11 @@ class view_react extends ViewEngine
             is_resource($proc) && proc_terminate($proc, SIGSTOP);
         }
         if (isset($this->_openProcId)) {
-            posix_kill($this->_openProcId, SIGTERM);
-            posix_kill($this->_openProcId, SIGKILL);
+            $sid = posix_getsid($this->_openProcId);
+            if ($sid) {
+                posix_kill($this->_openProcId, SIGTERM);
+                posix_kill($this->_openProcId, SIGKILL);
+            }
         }
     }
 
@@ -65,11 +68,11 @@ class view_react extends ViewEngine
             echo stream_get_line($pipes[1], 8192, SEPARATOR);
             $this['ssrcb'] = function () use ($proc, $pipes) {
                 while (!feof($pipes[1])) {
+                    echo stream_get_line($pipes[1], 8192, '');
                     if (connection_aborted()) {
                         $this->_killProc($proc, $pipes);
-                        exit();
+                        die();
                     }
-                    echo stream_get_line($pipes[1], 8192, '');
                 }
                 $this->_killProc($proc, $pipes);
             };
