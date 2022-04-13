@@ -40,8 +40,11 @@ class view_react extends ViewEngine
             is_resource($proc) && proc_terminate($proc, SIGSTOP);
         }
         if (isset($this->_openProcId)) {
-            posix_kill($this->_openProcId, SIGTERM);
-            posix_kill($this->_openProcId, SIGKILL);
+            $sid = posix_getsid($this->_openProcId);
+            if ($sid) {
+                posix_kill($this->_openProcId, SIGTERM);
+                posix_kill($this->_openProcId, SIGKILL);
+            }
         }
     }
 
@@ -69,7 +72,7 @@ class view_react extends ViewEngine
                 while (!feof($pipes[1])) {
                     if (connection_aborted()) {
                         $this->_killProc($proc, $pipes);
-                        exit();
+                        die();
                     }
                     $streamContent .=  stream_get_line($pipes[1], $this->_bsize, '');
                 }
