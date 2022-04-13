@@ -67,7 +67,7 @@ class view_react extends ViewEngine
             fwrite($pipes[0], $input);
             fclose($pipes[0]);
             echo stream_get_line($pipes[1], $this->_bsize, SEPARATOR);
-            $this['ssrcb'] = function () use ($proc, $pipes) {
+            $this['ssrCb'] = function () use ($proc, $pipes) {
                 $streamContent = '';
                 while (!feof($pipes[1])) {
                     if (connection_aborted()) {
@@ -141,7 +141,7 @@ class view_react extends ViewEngine
      */
     public function ssrBody()
     {
-        $this['ssrcb']();
+        $this['ssrCb']();
         $this->flush();
     }
 
