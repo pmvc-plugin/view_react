@@ -57,26 +57,38 @@ class view_react extends ViewEngine
     {
         $proc = proc_open(
             $command,
-            [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'a']],
+            [
+                ['pipe', 'r'], // stdin
+                ['pipe', 'w'], // stdout
+                ['pipe', 'w'], // stderr
+            ],
             $pipes
         );
         if (is_resource($proc)) {
-            ignore_user_abort(true);
             $procInfo = proc_get_status($proc);
             $this->_openProcId = $procInfo['pid'];
             fwrite($pipes[0], $input);
             fclose($pipes[0]);
             echo stream_get_line($pipes[1], $this->_bsize, SEPARATOR);
+            $this->flush();
+            ignore_user_abort(true);
             $this['ssrCb'] = function () use ($proc, $pipes) {
                 $streamContent = '';
-                while (!feof($pipes[1])) {
+                $lastStream = '';
+                while (true !== feof($pipes[1]) || false !== $lastStream) {
                     if (connection_aborted()) {
                         $this->_killProc($proc, $pipes);
                         die();
                     }
-                    $streamContent .=  stream_get_line($pipes[1], $this->_bsize, '');
+                    $lastStream = stream_get_line($pipes[1], $this->_bsize, '');
+                    $streamContent .= $lastStream;
                 }
                 echo $streamContent;
+                $error = stream_get_contents($pipes[1], $this->_bsize);
+                if (!empty($error)) {
+                    trigger_error($error);
+                }
+                $this->flush();
                 $this->_killProc($proc, $pipes);
             };
         }
@@ -132,7 +144,6 @@ class view_react extends ViewEngine
     {
         $this['reactData'] = $this->get();
         $this->_process_ssr($this['reactData']);
-        $this->flush();
     }
 
     /**
@@ -142,7 +153,6 @@ class view_react extends ViewEngine
     public function ssrBody()
     {
         $this['ssrCb']();
-        $this->flush();
     }
 
     public function process()
