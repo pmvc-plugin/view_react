@@ -52,6 +52,7 @@ echo '{"themePath":"home"}' | node ./server.js
 - https://github.com/pmvc-plugin/view_react/issues/1
 - Can't set header for none encoding, original proposal was for disable proxy cache to improve first bytes.
 
-```
-    'Content-Encoding: none'
+```diff
+-    'Content-Encoding: none'
++    'Content-Encoding: identity'
 ```
