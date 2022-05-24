@@ -53,6 +53,14 @@ class view_react extends ViewEngine
         $this->_killProc();
     }
 
+    private function _checkConnection()
+    {
+        if (connection_aborted()) {
+            $this->_killProc($proc, $pipes);
+            die();
+        }
+    }
+
     private function _shell($command, $input)
     {
         $proc = proc_open(
@@ -65,21 +73,19 @@ class view_react extends ViewEngine
             $pipes
         );
         if (is_resource($proc)) {
+            ignore_user_abort(true);
             $procInfo = proc_get_status($proc);
             $this->_openProcId = $procInfo['pid'];
             fwrite($pipes[0], $input);
             fclose($pipes[0]);
             echo stream_get_line($pipes[1], $this->_bsize, SEPARATOR);
             $this->flush();
-            ignore_user_abort(true);
             $this['ssrCb'] = function () use ($proc, $pipes) {
+                $this->_checkConnection();
                 $streamContent = '';
                 $lastStream = '';
                 while (true !== feof($pipes[1]) || false !== $lastStream) {
-                    if (connection_aborted()) {
-                        $this->_killProc($proc, $pipes);
-                        die();
-                    }
+                    $this->_checkConnection();
                     $lastStream = stream_get_line($pipes[1], $this->_bsize, '');
                     $streamContent .= $lastStream;
                 }
