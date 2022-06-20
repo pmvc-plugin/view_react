@@ -113,10 +113,11 @@ class view_react extends ViewEngine
         );
         $js = \PMVC\realPath($js);
         $cmd = $nodejs . ' ' . $js;
-        \PMVC\dev(function () use ($cmd, $data) {
+        \PMVC\dev(function () use ($data, $nodejs, $js) {
             $tmpFile = tempnam(sys_get_temp_dir(), 'react-data-');
             chmod($tmpFile, 0777);
             file_put_contents($tmpFile, $data);
+            $cmd = $nodejs . ' --trace-warnings ' . $js;
             $s = 'cat ' . $tmpFile . ' | ' . $cmd;
             return $s;
         }, 'view');
