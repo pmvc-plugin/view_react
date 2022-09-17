@@ -170,8 +170,5 @@ class view_react extends ViewEngine
         } else {
             trigger_error('Template fie was not found: [' . $file . ']');
         }
-        if (!empty($this['run'])) {
-            $this->clean();
-        }
     }
 }
